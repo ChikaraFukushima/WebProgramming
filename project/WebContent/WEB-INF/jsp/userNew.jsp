@@ -4,8 +4,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<!-- オリジナルCSS読み込み -->
+<link rel="stylesheet" type="text/css" href="css/original/user.css">
+<!-- ブートストラップ CSS読み込み -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-<link rel = "stylesheet" href = "user.css">
+
 <title>ユーザ新規登録</title>
 </head>
 <body>
@@ -17,7 +20,7 @@
 <a href = "LogoutServlet2">
 	<small><span style="color:#ff0000;">ログアウト</span></small></a></p>
 </div>
-
+<div>
 <h1><strong>ユーザー新規登録</strong></h1>
 
 
@@ -31,6 +34,7 @@
 			<input type = "submit" value = "登録"></a></p>
 			</form>
 <p></p>
+</div>
 <a href ="UserListServlet2">
 <p class="user2">戻る</p></a>
 
