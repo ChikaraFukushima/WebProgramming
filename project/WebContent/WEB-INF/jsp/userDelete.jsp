@@ -26,11 +26,13 @@
 <p>を本当に削除してもよろしいですか？ <p/>
 
 <form class="" action="UserDeleteServlet2" method="post">
-<input type="hidden" value="${user.id}" name = "id">
-<button type="submit" class="btn btn-primary btn-lg">はい</button>
+<input type="hidden" name = "id" value="${user.id}">
+<button type="submit" name=delete class="btn btn-primary btn-lg">削除</button>
+</form>
+<form action="UserListServlet2" method="get">
 
 <a href = "UserListServlet2">
-<button type="button" class="btn btn-secondary btn-lg">いいえ</button></a>
+<button type="submit" class="btn btn-secondary btn-lg">いいえ</button></a>
 
 </form>
 </div>

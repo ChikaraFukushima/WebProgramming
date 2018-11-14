@@ -30,6 +30,12 @@ public class UserDeleteServlet2 extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		if(request.getSession().getAttribute("userInfo")==null){
+			response.sendRedirect("LoginServlet2");
+			return;
+		}
+
 		// リクエストパラメータの文字コードを指定
 		request.setCharacterEncoding("UTF-8");
 
@@ -39,7 +45,7 @@ public class UserDeleteServlet2 extends HttpServlet {
 
 		// リクエストパラメータの入力項目を引数に渡して、Daoのメソッドを実行
 		UserDao userDao = new UserDao();
-		User userList = userDao.info(id);
+		User user = userDao.info(id);
 
 		// ユーザ削除確認へのフォワード
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/userDelete.jsp");
@@ -55,7 +61,7 @@ public class UserDeleteServlet2 extends HttpServlet {
 		String id = request.getParameter("id");
 		//Daoのメソッドを実行
 		UserDao userDao = new UserDao();
-		User user = userDao.Delete(id);
+		userDao.Delete(id);
 		//処理をしたのちにユーザ一覧画面へフォワード
 		response.sendRedirect("UserListServlet2");
 	}

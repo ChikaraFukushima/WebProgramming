@@ -11,11 +11,7 @@ import java.util.List;
 
 import model.User;
 
-/**
- * ユーザテーブル用のDao
- * @author takano
- *
- */
+
 public class UserDao {
 
     /**
@@ -65,10 +61,7 @@ public class UserDao {
     }
 
 
-    /**
-     * 全てのユーザ情報を取得する
-     * @return
-     */
+    //全てのユーザ情報を取得
     public List<User> findAll() {
         Connection conn = null;
         List<User> userList = new ArrayList<User>();
@@ -78,8 +71,10 @@ public class UserDao {
             conn = DBManager.getConnection();
 
             // SELECT文を準備
-            // TODO: 未実装：管理者以外を取得するようSQLを変更する
+
             String sql = "SELECT * FROM user";
+         // TODO: 未実装：管理者以外を取得するようSQLを変更する
+
 
              // SELECTを実行し、結果表を取得
             Statement stmt = conn.createStatement();
@@ -121,8 +116,9 @@ public class UserDao {
 	public User info(String id) {
 		Connection conn = null;
     	try {
+    		 // データベースへ接続
     		 conn = DBManager.getConnection();
-
+    		 //select文用意
     		 String sql = "SELECT * FROM user WHERE id = ?";
 
     		  PreparedStatement pStmt = conn.prepareStatement(sql);
@@ -159,7 +155,7 @@ public class UserDao {
 
 
 	//ユーザ新規登録用のプログラム//
-    public User New(String loginId,  String password,String name, String birthDate ) throws SQLException{
+    public User New(String loginId,String password,String name, String birthDate ) throws SQLException{
     	Connection conn = null;
     	try {
     		 // データベースへ接続
@@ -194,16 +190,84 @@ public class UserDao {
 
 
     //ユーザ情報削除のためのコード//
-    public 	User Delete(String id) {
-    	Connection conn = null;
+    public void Delete(String id) {
+
+    	Connection conn=null;
+
+    	conn=DBManager.getConnection();
+
+
+    	try {
+    		conn=DBManager.getConnection();
+
+    		String sql="DELETE FROM user WHERE id=?";
+
+
+
+    		PreparedStatement pStmt=conn.prepareStatement(sql);
+
+
+    		pStmt.setString(1,id);
+
+    		pStmt.executeUpdate();
+
+
+    	}catch(SQLException e) {
+    		e.printStackTrace();
+    	}finally {
+    		if (conn!=null) {
+    			try {
+    				conn.close();
+    			}catch(SQLException e){
+    				e.printStackTrace();
+    			}
+    		}
+    	}
+    }
+
+
+     //ユーザーの検索？？ユーザーリストで使用
+	public List<User> UserSearch(String loginId, String userName, String dateStart, String dateEnd) {
+
+
+		Connection conn = null;
+		List<User> userList = new ArrayList<User>();
 		try {
 			conn = DBManager.getConnection();
-			String sql = "DELETE FROM user WHERE id = ?";
-			PreparedStatement pStmt = conn.prepareStatement(sql);
+			String sql = "SELECT * FROM user WHERE id != 1";
 
-			pStmt.setString(1, id);
+			if(!loginId.equals("")) {
+				sql += " AND login_id = '" + loginId + "'";
+			}
 
-			int result = pStmt.executeUpdate();
+			if(!userName.equals("")) {
+				sql += " AND name LIKE '%" + userName + "%'";
+			}
+
+			if(!dateStart.equals("")) {
+				sql += " AND birth_date >= '" + dateStart + "'";
+			}
+
+			if(!dateEnd.equals("")) {
+				sql += " AND birth_date <= '" + dateEnd + "'";
+			}
+
+			System.out.println(sql);
+
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while(rs.next()) {
+				int id = rs.getInt("id");
+				String loginId1 = rs.getString("login_id");
+				String name = rs.getString("name");
+				Date birthDate = rs.getDate("birth_date");
+				String password = rs.getString("password");
+				String createDate = rs.getString("create_date");
+				String updateDate = rs.getString("update_date");
+				User user = new User(id, loginId1, name, birthDate, password,createDate,updateDate);
+				userList.add(user);
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -218,15 +282,9 @@ public class UserDao {
 				}
 			}
 		}
-		return null;
-    }
-
-
-
-	public List<User> findSearch(String loginId, String userName, String dateStart, String dateEnd) {
-
-		return null;
+		return userList;
 	}
+
 
 
 //ユーザ情報更新用のコード//
@@ -290,5 +348,6 @@ public User UpdateNoPassword(String name, String birthDate, String id) {
 	return null;
 }
 }
+
 
 

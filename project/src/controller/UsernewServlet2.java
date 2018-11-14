@@ -19,9 +19,7 @@ import model.User;
 public class UsernewServlet2 extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-    /**
-     * @see HttpServlet#HttpServlet2()
-     */
+
     public UsernewServlet2() {
         super();
 
@@ -29,9 +27,11 @@ public class UsernewServlet2 extends HttpServlet {
 
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-
-
+		//ログインしてない場合
+				if(request.getSession().getAttribute("userInfo")==null){
+					response.sendRedirect("LoginServlet2");
+					return;
+				}
 
 			// userNew.jspへのフォワード
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/userNew.jsp");
@@ -42,6 +42,8 @@ public class UsernewServlet2 extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+
 		//お決まりの文字のやつ
 		request.setCharacterEncoding("UTF-8");
 
@@ -66,7 +68,7 @@ public class UsernewServlet2 extends HttpServlet {
 		/** 追加できた場合 **/
 		UserDao userDao = new UserDao();
 		try {
-			User user = userDao.New(loginId, password,name,birthDate);
+			User user = userDao.New(loginId,password,name,birthDate);
 		} catch (SQLException e) {
 
 			e.printStackTrace();
