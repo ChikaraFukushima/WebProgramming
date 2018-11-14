@@ -48,6 +48,7 @@ public class UserDeleteServlet2 extends HttpServlet {
 		User user = userDao.info(id);
 
 		// ユーザ削除確認へのフォワード
+		request.setAttribute("user", user);
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/userDelete.jsp");
 		dispatcher.forward(request, response);
 		return;

@@ -26,14 +26,19 @@ public class LoginServlet2 extends HttpServlet {
 	}
 
 
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// TODO 未実装：ログインセッションがある場合、ユーザ一覧画面にリダイレクトさせる
+		HttpSession session = request.getSession();
+		 if(session.getAttribute("userinfo") == null) {
+			 RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
+		        dispatcher.forward(request, response);
+		 } else {
+			 response.sendRedirect("UserListServlet2");
+		 }
 
-		// フォワード
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
-		dispatcher.forward(request, response);
+
 	}
 
 

@@ -1,5 +1,9 @@
 package dao;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -8,6 +12,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.DatatypeConverter;
 
 import model.User;
 
@@ -166,7 +172,7 @@ public class UserDao {
     		PreparedStatement pStmt = conn.prepareStatement(sql);
 
 			pStmt.setString(1, loginId);
-			pStmt.setString(2, password);
+			pStmt.setString(2, md5(password));
 			pStmt.setString(3, name);
 			pStmt.setString(4, birthDate);
 
@@ -189,32 +195,28 @@ public class UserDao {
     }
 
 
-    //ユーザ情報削除のためのコード//
+    //ユーザ情報削除のためのコード。IDを受け取って一致したら削除//
     public void Delete(String id) {
 
     	Connection conn=null;
-
+    	// データベースへ接続
     	conn=DBManager.getConnection();
 
 
     	try {
     		conn=DBManager.getConnection();
-
+    		// DELETE文を準備
     		String sql="DELETE FROM user WHERE id=?";
-
-
-
     		PreparedStatement pStmt=conn.prepareStatement(sql);
-
-
     		pStmt.setString(1,id);
-
+    		// DELETE文を実行する
     		pStmt.executeUpdate();
 
 
     	}catch(SQLException e) {
     		e.printStackTrace();
     	}finally {
+    		// お決まりデータベース切断
     		if (conn!=null) {
     			try {
     				conn.close();
@@ -226,13 +228,113 @@ public class UserDao {
     }
 
 
-     //ユーザーの検索？？ユーザーリストで使用
-	public List<User> UserSearch(String loginId, String userName, String dateStart, String dateEnd) {
 
+
+
+//ユーザ情報更新用のコード//
+public User Update(String password, String name, String birthDate, String id) {
+	Connection conn = null;
+
+
+	try {
+		// データベースへ接続
+		conn = DBManager.getConnection();
+		// UPDATE文を準備
+		String sql = "UPDATE user SET password = ?, name = ?, birth_date = ? WHERE id = ?";
+		PreparedStatement pStmt = conn.prepareStatement(sql);
+		pStmt.setString(1, md5(password));
+		pStmt.setString(2, name);
+		pStmt.setString(3, birthDate);
+		pStmt.setString(4, id);
+		// UPDATEを実行
+		int result = pStmt.executeUpdate();
+
+	} catch (SQLException e){
+        e.printStackTrace();
+        return null;
+    } finally {
+    	// データベース切断(今後使う)
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+             }
+        }
+    }
+	return null;
+}
+
+
+public User UpdateNoPassword(String name, String birthDate, String id) {
+	Connection conn = null;
+	try {
+		// データベースへ接続
+		conn = DBManager.getConnection();
+		// UPDATE文を準備
+		String sql = "UPDATE user SET name = ?, birth_date = ? WHERE id = ?";
+		PreparedStatement pStmt = conn.prepareStatement(sql);
+
+		pStmt.setString(1, name);
+		pStmt.setString(2, birthDate);
+		pStmt.setString(3, id);
+		// UPDATEを実行
+		int result = pStmt.executeUpdate();
+
+	} catch (SQLException e){
+        e.printStackTrace();
+        return null;
+    } finally {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+             }
+        }
+    }
+	return null;
+}
+
+
+/*[暗号化するためのメソッド]を作りました
+*トライアンドキャッチはEclipseに怒られたのでクリックで追加)
+*/
+public String md5(String password) {
+	//ハッシュを生成したい元の文字列
+	String source = password;
+	//ハッシュ生成前にバイト配列に置き換える際のCharset
+	Charset charset = StandardCharsets.UTF_8;
+	//ハッシュアルゴリズム
+	String algorithm = "MD5";
+
+	//ハッシュ生成処理
+	byte[] bytes = null;
+	try {
+		bytes = MessageDigest.getInstance(algorithm).digest(source.getBytes(charset));
+	} catch (NoSuchAlgorithmException e) {
+		e.printStackTrace();
+	}
+	String result = DatatypeConverter.printHexBinary(bytes);
+	return result;
+}
+
+
+
+
+
+
+
+
+//ユーザーの検索:ユーザーリストで使用する用
+	public List<User> UserSearch(String loginId, String userName, String dateStart, String dateEnd) {
 
 		Connection conn = null;
 		List<User> userList = new ArrayList<User>();
 		try {
+			// データベースへ接続
 			conn = DBManager.getConnection();
 			String sql = "SELECT * FROM user WHERE id != 1";
 
@@ -285,68 +387,6 @@ public class UserDao {
 		return userList;
 	}
 
-
-
-//ユーザ情報更新用のコード//
-public User Update(String password, String name, String birthDate, String id) {
-	Connection conn = null;
-	try {
-		conn = DBManager.getConnection();
-		String sql = "UPDATE user SET password = ?, name = ?, birth_date = ? WHERE id = ?";
-		PreparedStatement pStmt = conn.prepareStatement(sql);
-		pStmt.setString(1, password);
-		pStmt.setString(2, name);
-		pStmt.setString(3, birthDate);
-		pStmt.setString(4, id);
-
-		int result = pStmt.executeUpdate();
-
-	} catch (SQLException e){
-        e.printStackTrace();
-        return null;
-    } finally {
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
-             }
-        }
-    }
-	return null;
-}
-
-
-public User UpdateNoPassword(String name, String birthDate, String id) {
-	Connection conn = null;
-	try {
-		conn = DBManager.getConnection();
-		String sql = "UPDATE user SET name = ?, birth_date = ? WHERE id = ?";
-
-		PreparedStatement pStmt = conn.prepareStatement(sql);
-
-		pStmt.setString(1, name);
-		pStmt.setString(2, birthDate);
-		pStmt.setString(3, id);
-
-		int result = pStmt.executeUpdate();
-
-	} catch (SQLException e){
-        e.printStackTrace();
-        return null;
-    } finally {
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
-             }
-        }
-    }
-	return null;
-}
 }
 
 
