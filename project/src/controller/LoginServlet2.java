@@ -30,11 +30,14 @@ public class LoginServlet2 extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		//条件分岐でログインフォームorリスト画面
 		HttpSession session = request.getSession();
 		 if(session.getAttribute("userinfo") == null) {
+			 //未ログイン
 			 RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
 		        dispatcher.forward(request, response);
 		 } else {
+			 //ログイン情報がある場合
 			 response.sendRedirect("UserListServlet2");
 		 }
 
@@ -58,7 +61,7 @@ public class LoginServlet2 extends HttpServlet {
 		/** テーブルに該当のデータが見つからなかった場合 **/
 		if (user == null) {
 			// リクエストスコープにエラーメッセージをセット
-			request.setAttribute("errMsg", "ログインに失敗しました。");
+			request.setAttribute("errMsg", "ログインIDまたはパスワードが異なります。");
 
 			// ログインjspにフォワード
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");

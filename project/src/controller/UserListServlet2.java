@@ -66,8 +66,8 @@ public class UserListServlet2 extends HttpServlet {
 
 
 		UserDao userDao = new UserDao();
-		//ユーザーの検索？？
-		List<User> user = userDao.UserSearch(loginId, userName, dateStart, dateEnd);
+		//ユーザーの検索未完成
+		List<User> user = userDao.Search(loginId, userName, dateStart, dateEnd);
 
 		// リクエストスコープにユーザ一覧情報をセット
 		request.setAttribute("userList", user);

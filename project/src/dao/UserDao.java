@@ -328,64 +328,71 @@ public String md5(String password) {
 
 
 
-//ユーザーの検索:ユーザーリストで使用する用
-	public List<User> UserSearch(String loginId, String userName, String dateStart, String dateEnd) {
+//全てのユーザ情報を取得
+public List<User> Search(String login_id, String name,String date_start, String date_End) {
+    Connection conn = null;
+    List<User> userList = new ArrayList<User>();
 
-		Connection conn = null;
-		List<User> userList = new ArrayList<User>();
-		try {
-			// データベースへ接続
-			conn = DBManager.getConnection();
-			String sql = "SELECT * FROM user WHERE id != 1";
+    try {
+        // データベースへ接続
+        conn = DBManager.getConnection();
 
-			if(!loginId.equals("")) {
-				sql += " AND login_id = '" + loginId + "'";
-			}
+        // SELECT文を準備
 
-			if(!userName.equals("")) {
-				sql += " AND name LIKE '%" + userName + "%'";
-			}
+     // TODO: 管理者(admin)以外を取得するようSQLを変更するコード⬇︎
+        String sql = "SELECT * FROM user WHERE login_id NOT IN ('admin')";
 
-			if(!dateStart.equals("")) {
-				sql += " AND birth_date >= '" + dateStart + "'";
-			}
 
-			if(!dateEnd.equals("")) {
-				sql += " AND birth_date <= '" + dateEnd + "'";
-			}
+        if(!login_id.equals("")) {
+        		sql += " AND login_id = '" + login_id + "'";
+        }
+        if(!name.equals("")) {
+        		sql += " AND  name  LIKE '%" + name + "%'";
+        }
+        if(!date_start.equals("")) {
+    		sql += " AND birth_date >= '" + date_start + "'";
+        }
+        if(!date_start.equals("")) {
+    		sql += " AND birth_date <= '" + date_End + "'";
+        }
 
-			System.out.println(sql);
+        System.out.println(sql);
 
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
+         // SELECTを実行し、結果表を取得
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
 
-			while(rs.next()) {
-				int id = rs.getInt("id");
-				String loginId1 = rs.getString("login_id");
-				String name = rs.getString("name");
-				Date birthDate = rs.getDate("birth_date");
-				String password = rs.getString("password");
-				String createDate = rs.getString("create_date");
-				String updateDate = rs.getString("update_date");
-				User user = new User(id, loginId1, name, birthDate, password,createDate,updateDate);
-				userList.add(user);
-			}
+        // 結果表に格納されたレコードの内容を
+        // Userインスタンスに設定し、ArrayListインスタンスに追加
+        while (rs.next()) {
+            int id = rs.getInt("id");
+            String loginId = rs.getString("login_id");
+            String name1 = rs.getString("name");
+            Date birthDate = rs.getDate("birth_date");
+            String password = rs.getString("password");
+            String createDate = rs.getString("create_date");
+            String updateDate = rs.getString("update_date");
+            User user = new User(id, loginId, name1, birthDate, password, createDate, updateDate);
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		} finally {
-			if(conn != null) {
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-					return null;
-				}
-			}
-		}
-		return userList;
-	}
+            userList.add(user);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return null;
+    } finally {
+        // データベース切断
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+    return userList;
+}
+
 
 }
 

@@ -75,7 +75,8 @@
 <!-- 無理やり空間 -->
 <br><br><br>
 
-              </form>
+      </form>
+
         <div class="table-responsive">
              <table class="table table-striped">
                <thead>
@@ -87,17 +88,32 @@
                  </tr>
                </thead>
                <tbody>
+
                  <c:forEach var="user" items="${userList}" >
                    <tr>
                      <td>${user.loginId}</td>
                      <td>${user.name}</td>
                      <td>${user.birthDate}</td>
-                     <!-- TODO 未実装；ログインボタンの表示制御を行う -->
-                     <td>
-                       <a class="btn btn-primary" href="UserInfoServlet2?id=${user.id}">詳細</a>
-                       <a class="btn btn-success" href="UserUpdateServlet2?id=${user.id}">更新</a>
-                       <a class="btn btn-danger" href ="UserDeleteServlet2?id=${user.id}">削除</a>
-                     </td>
+
+<c:if test="${userInfo.loginId == 'admin'}">
+    <td>
+         <a class="btn btn-primary" href="UserInfoServlet2?id=${user.id}">詳細</a>
+         <a class="btn btn-success" href="UserUpdateServlet2?id=${user.id}">更新</a>
+         <a class="btn btn-danger" href ="UserDeleteServlet2?id=${user.id}">削除</a>
+    </td>
+</c:if>
+
+<!-- 追加11/14 -->
+<c:if test="${userInfo.loginId != 'admin'}">
+	<td><a href = "UserInfoServlet2?id=${user.id}"
+	class="btn btn-primary">詳細</a>
+</c:if>
+
+<c:if test="${user.loginId == userInfo.loginId}">
+	<a href = "UserUpdateServlet2?id=${user.id}"
+	class="btn btn-success">更新</a>
+</c:if>
+
                    </tr>
                  </c:forEach>
                </tbody>
